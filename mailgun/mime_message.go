@@ -7,22 +7,28 @@ import (
 	"log"
 	"mime/multipart"
 	"net/http"
+	"strings"
 )
 
 // MimeMessage is the structure for communicating a MIME message to Mailgun.
 type MimeMessage struct {
-	ToAddress string
-	Content   []byte
+	ToAddressList []string
+	Content       []byte
 }
 
 // IsValid verifies that the Message has all of the required
 // fields filled in
 func (message MimeMessage) IsValid() (validity bool) {
-	if message.ToAddress == "" || string(message.Content) == "" {
+	if message.ToAddresses() == "" || string(message.Content) == "" {
 		return false
 	}
 
 	return true
+}
+
+// ToAddresses returns a string-ified version of the ToAddressList
+func (message MimeMessage) ToAddresses() string {
+	return strings.Join(message.ToAddressList, ", ")
 }
 
 // MimeReader returns a reader from which the MIME email may be read. Mailgun
@@ -35,7 +41,7 @@ func (message MimeMessage) MimeReader() (b io.Reader, boundary string) {
 
 	go func() {
 		defer mimeWriter.Close()
-		mimeWriter.WriteField("to", message.ToAddress)
+		mimeWriter.WriteField("to", message.ToAddresses())
 
 		messageField, err := mimeWriter.CreateFormFile("message", "message.mime")
 		if err != nil {

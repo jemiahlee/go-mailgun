@@ -25,7 +25,7 @@ func TestURLValues(t *testing.T) {
 	m := Message{
 		FromName:       "Testy McTestsalot",
 		FromAddress:    "test@foo.org",
-		ToAddress:      "bar@baz.org",
+		ToAddressList:  []string{"bar@baz.org"},
 		CCAddressList:  []string{"cc1@foo.org", "cc2@baz.org"},
 		BCCAddressList: []string{"bcc1@baz.org", "bcc2@foo.org"},
 		Subject:        "Best subject evar!",
@@ -69,11 +69,11 @@ func TestURLValues(t *testing.T) {
 
 func TestMinimalURLValues(t *testing.T) {
 	m := Message{
-		FromName:    "Testy McTestsalot",
-		FromAddress: "test@foo.org",
-		ToAddress:   "bar@baz.org",
-		Subject:     "Best subject evar!",
-		Body:        "This is my body. There are many like it but this one is mine."}
+		FromName:      "Testy McTestsalot",
+		FromAddress:   "test@foo.org",
+		ToAddressList: []string{"bar@baz.org"},
+		Subject:       "Best subject evar!",
+		Body:          "This is my body. There are many like it but this one is mine."}
 	urlValues := m.URLValues()
 
 	if urlValues.Get("from") != "Testy McTestsalot <test@foo.org>" {
@@ -113,22 +113,22 @@ func TestMinimalURLValues(t *testing.T) {
 // A Message needs to have a ToAddress, FromAddress, Subject, and Body.
 func TestMessageValidity(t *testing.T) {
 	m := Message{
-		FromName:    "Testy McTestsalot",
-		FromAddress: "test@foo.org",
-		ToAddress:   "bar@baz.org",
-		Subject:     "Best subject evar!",
-		Body:        "This is my body. There are many like it but this one is mine."}
+		FromName:      "Testy McTestsalot",
+		FromAddress:   "test@foo.org",
+		ToAddressList: []string{"bar@baz.org"},
+		Subject:       "Best subject evar!",
+		Body:          "This is my body. There are many like it but this one is mine."}
 
 	if m.IsValid() != true {
 		t.Error("Message should have been valid!")
 	}
 
-	m.ToAddress = ""
+	m.ToAddressList = []string{}
 	if m.IsValid() != false {
 		t.Error("Message(2) should have been invalid!")
 	}
 
-	m = Message{ToAddress: "bar@baz.org"}
+	m = Message{ToAddressList: []string{"bar@baz.org"}}
 	if m.IsValid() != false {
 		t.Error("Message(3) should have been invalid!")
 	}

@@ -16,7 +16,7 @@ func TestSendWithGoodServer(t *testing.T) {
 	message := Message{
 		FromName:       "Testy McTestsalot",
 		FromAddress:    "test@foo.org",
-		ToAddress:      "bar@baz.org",
+		ToAddressList:  []string{"bar@baz.org"},
 		CCAddressList:  []string{"cc1@foo.org", "cc2@baz.org"},
 		BCCAddressList: []string{"bcc1@baz.org", "bcc2@foo.org"},
 		Subject:        "Best subject evar!",
@@ -32,7 +32,7 @@ func TestSendWithGoodServer(t *testing.T) {
 
 		recvToExpected := map[string]string{
 			r.FormValue("from"):       message.From(),
-			r.FormValue("to"):         message.ToAddress,
+			r.FormValue("to"):         strings.Join(message.ToAddressList, ", "),
 			r.FormValue("cc"):         message.CCAddresses(),
 			r.FormValue("bcc"):        message.BCCAddresses(),
 			r.FormValue("subject"):    message.Subject,
@@ -74,12 +74,12 @@ func TestMimeSendWithGoodServer(t *testing.T) {
 	}
 
 	message := MimeMessage{
-		ToAddress: "to_address@bar.org",
-		Content:   mimeContent}
+		ToAddressList: []string{"to_address@bar.org"},
+		Content:       mimeContent}
 
 	test_server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.FormValue("to") != message.ToAddress {
-			t.Error("Received '" + r.FormValue("to") + "' instead of '" + message.ToAddress + "'!")
+		if r.FormValue("to") != message.ToAddresses() {
+			t.Error("Received '" + r.FormValue("to") + "' instead of '" + message.ToAddresses() + "'!")
 		}
 
 		file, _, _ := r.FormFile("message")

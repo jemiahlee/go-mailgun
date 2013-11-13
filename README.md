@@ -30,11 +30,11 @@ and the body must all be specified.
 
 ```
 	message := mailgun.Message{
-		FromName:    "Foo From",
-		FromAddress: "foo@fakedomaingoeshere.com",
-		ToAddress:   "bar@anotherfakedomainhere.com",
-		Subject:     "test message",
-		Body:        "This is the body of the message. It's not very interesting.",
+		FromName:      "Foo From",
+		FromAddress:   "foo@fakedomaingoeshere.com",
+		ToAddressList: []string{"bar@anotherfakedomainhere.com"},
+		Subject:       "test message",
+		Body:          "This is the body of the message. It's not very interesting.",
 	}
 
 	mg_client.Send(message)
@@ -48,8 +48,8 @@ in.
 
 ```
 	mime_message := mailgun.MimeMessage{
-		ToAddress:   "sent_to_address@fakedomainhere.com",
-		Content: mimeContents}
+		ToAddressList: []string{"sent_to_address@fakedomainhere.com"},
+		Content:       mimeContents}
 
 	mg_client.Send(message2)
 ```

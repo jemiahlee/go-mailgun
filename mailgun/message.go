@@ -11,7 +11,7 @@ import (
 type Message struct {
 	FromName       string
 	FromAddress    string
-	ToAddress      string
+	ToAddressList  []string
 	CCAddressList  []string
 	BCCAddressList []string
 	Subject        string
@@ -23,6 +23,11 @@ type Message struct {
 // From concatenates the FromName and FromAddress of the message
 func (m Message) From() string {
 	return fmt.Sprintf("%s <%s>", m.FromName, m.FromAddress)
+}
+
+// ToAddresses returns a string-ified version of the ToAddressList
+func (message Message) ToAddresses() string {
+	return strings.Join(message.ToAddressList, ", ")
 }
 
 // BCCAddresses joins the BCCAddressList together with commas
@@ -38,7 +43,7 @@ func (m Message) CCAddresses() string {
 // IsValid verifies that the Message has all of the required
 // fields filled in
 func (message Message) IsValid() (validity bool) {
-	if message.ToAddress == "" ||
+	if message.ToAddresses() == "" ||
 		message.FromAddress == "" ||
 		message.Subject == "" ||
 		message.Body == "" {
@@ -52,7 +57,7 @@ func (message Message) IsValid() (validity bool) {
 // for POSTing to Mailgun
 func (m Message) URLValues() url.Values {
 	values := make(url.Values)
-	values.Set("to", m.ToAddress)
+	values.Set("to", m.ToAddresses())
 	values.Set("from", m.From())
 	values.Set("subject", m.Subject)
 	values.Set("text", m.Body)
